@@ -24,7 +24,16 @@ exports.addMedicine = async (req, res) => {
     res.status(500).json({ message: "Error adding medicine", error });
   }
 };
-
+//Get all List of Medicines
+exports.getMedicine= async (req,res)=>{
+  try {
+    const medicines = await Medicine.find();
+    res.status(200).json(medicines);
+    console.log(medicines);
+  } catch (e) {
+    res.status(500).json({ message: "Internal Server Problem" });
+  }
+};
 // Update an existing medicine
 exports.updateMedicine = async (req, res) => {
   try {
@@ -64,15 +73,22 @@ exports.updateMedicine = async (req, res) => {
 exports.deleteMedicine = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
 
-    const deletedMedicine = await Medicine.findByIdAndDelete(id);
+    // Find the medicine by ID
+    const medicine = await Medicine.findById(id);
 
-    if (!deletedMedicine) {
+    if (!medicine) {
       return res.status(404).json({ message: "Medicine not found" });
     }
 
-    res.status(200).json({ message: "Medicine deleted successfully" });
+    // Checking  if the medicine is expired
+    const currentDate = new Date();
+    const expiryDate = new Date(medicine.expiry_date);
+    if (expiryDate > currentDate) {
+      return res.status(400).json({ message: "Medicine has not expired yet" });
+    }
+    await Medicine.findByIdAndDelete(id);
+    res.status(200).json({ message: "Expired medicine deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting medicine", error });
   }
