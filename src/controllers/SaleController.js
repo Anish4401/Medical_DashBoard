@@ -55,11 +55,22 @@ exports.getMonthlySales = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "medicines", // Name of the medicines collection
+          localField: "medicine_id",
+          foreignField: "_id",
+          as: "medicineDetails",
+        },
+      },
+      {
+        $unwind: "$medicineDetails",
+      },
+      {
         $group: {
           _id: "$medicine_id",
           total_quantity: { $sum: "$quantity" },
           total_sales: {
-            $sum: { $multiply: ["$quantity", "$medicine_id.cost"] },
+            $sum: { $multiply: ["$quantity", "$medicineDetails.cost"] },
           },
         },
       },
@@ -70,3 +81,4 @@ exports.getMonthlySales = async (req, res) => {
     res.status(500).json({ message: "Error fetching monthly sales", error });
   }
 };
+
