@@ -4,6 +4,10 @@ const Medicine = require("../models/Medicine");
 exports.addMedicine = async (req, res) => {
   try {
     const { name, cost, expiry_date, gst_applicable, discount } = req.body;
+    const existingMedicine=await Medicine.findOne({name});
+    if(existingMedicine){
+      res.status(400).json({message:"Same medicine exist in this Update it,data:existingMedicine})
+    }}
     const newMedicine = new Medicine({
       name,
       cost,
