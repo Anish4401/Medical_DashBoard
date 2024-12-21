@@ -2,7 +2,7 @@ const Sale = require("../models/Sale");
 const Medicine = require("../models/Medicine");
 
 // Record a new sale
- export.recordSale = async (req, res) => {
+ exports.recordSale = async (req, res) => {
   try {
     const { medicine_id, quantity, sale_date } = req.body;
 
@@ -10,7 +10,7 @@ const Medicine = require("../models/Medicine");
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Check if medicineId exists in the database (assuming you have a Medicines collection)
+    
     const medicineExists = await Medicine.findById(medicine_id);
     if (!medicineExists) {
       return res.status(404).json({ message: "Medicine not found" });
