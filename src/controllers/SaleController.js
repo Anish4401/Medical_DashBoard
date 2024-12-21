@@ -2,29 +2,55 @@ const Sale = require("../models/Sale");
 const Medicine = require("../models/Medicine");
 
 // Record a new sale
-exports.recordSale = async (req, res) => {
+ export.recordSale = async (req, res) => {
   try {
     const { medicine_id, quantity, sale_date } = req.body;
 
-    const medicine = await Medicine.findById(medicine_id);
-    if (!medicine) {
+    if (!medicine_id || !quantity || !sale_date) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Check if medicineId exists in the database (assuming you have a Medicines collection)
+    const medicineExists = await Medicine.findById(medicine_id);
+    if (!medicineExists) {
       return res.status(404).json({ message: "Medicine not found" });
     }
 
-    const newSale = new Sale({
-      medicine_id,
-      quantity,
-      sale_date,
+    // Finding  if a sale entry for the same medicine exists on the given date
+    const existingSale = await Sale.findOne({
+      medicine_id: medicine_id,
+      sale_date: sale_date,
     });
 
-    await newSale.save();
-    res
-      .status(201)
-      .json({ message: "Sale recorded successfully", data: newSale });
+    if (existingSale) {
+      //Updating the records
+      existingSale.quantity += quantity;
+      await existingSale.save();
+      return res.status(200).json({
+        message: "Sale updated successfully",
+        data: existingSale,
+      });
+    } else {
+    
+      const newSale = new Sale({
+        medicine_id: medicine_id,
+        quantity: quantity,
+        sale_date: sale_date,
+      });
+
+      await newSale.save();
+      return res.status(201).json({
+        message: "Sale recorded successfully",
+        data: newSale,
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: "Error recording sale", error });
   }
 };
+
+
+ 
 
 // Get daily sales
 exports.getDailySales = async (req, res) => {
