@@ -43,6 +43,6 @@ This assignment demonstrates proficiency in backend development, database integr
 1) MedicineModel
 2) SalesModel
 
--In **Route** Folder-
-1)MedicineRoute
-2)SalesRoute
+-In **Route** :
+1) MedicineRoute
+2) SalesRoute
