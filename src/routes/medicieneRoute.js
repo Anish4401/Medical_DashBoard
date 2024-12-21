@@ -5,15 +5,7 @@ const medicieneController = require("../controllers/medicieneController");
 
 
 router.post("/", medicieneController.addMedicine) 
-router.get("/", async (req, res) => {
-  try {
-    const medicines = await Medicine.find();
-    res.status(200).json(medicines);
-    console.log(medicines);
-  } catch (e) {
-    res.status(500).json({ message: "Internal Server Problem" });
-  }
-});
+router.get("/",medicieneController.getMedicine )
 
 router.put("/:id", medicieneController.updateMedicine);
 router.delete("/:id", medicieneController.deleteMedicine);
