@@ -50,6 +50,37 @@ const Medicine = require("../models/Medicine");
 };
 
 
+exports.getMedicine = async (req, res) => {
+  try {
+    const discountPercentage = 20; 
+    const cutoffDate = new Date("2025-01-31"); 
+
+  
+    const medicines = await Medicine.find({
+      expiry_date: { $lte: cutoffDate }
+    });
+
+    if (!medicines.length) {
+      return res.status(404).json({ message: "No medicines expiring on or before 31/01/2025" });
+    }
+
+    // Apply discount to the medicines
+    const discountedMedicines = medicines.map(medicine => {
+      const discountedPrice = medicine.cost - (medicine.cost * discountPercentage) / 100;
+      return {
+        ...medicine._doc, 
+        discountedPrice
+      };
+    });
+
+    // Respond with discounted medicines
+    res.status(200).json(discountedMedicines);
+    console.log(discountedMedicines);
+  } catch (e) {
+    res.status(500).json({ message: "Internal Server Problem" });
+  }
+};
+
  
 
 // Get daily sales
